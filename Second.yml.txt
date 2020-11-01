@@ -1,0 +1,57 @@
+---
+ - hosts: all
+   become: yes
+   gather_facts: no
+   vars_prompt:
+    - name: first_path
+      prompt: Enter file path in first run
+      private: false
+    - name: second_path
+      prompt: Enter file path in second run
+      private: false
+   tasks:
+    - command: "cat {{first_path}}"
+      register: file1_data
+      delegate_to: "{{groups.Run_1[0]}}"
+      run_once: yes
+    - command: "cat {{second_path}}"
+      register: file2_data
+      delegate_to: "{{groups.Run_2[0]}}"
+      run_once: yes
+    - command: "ls -Z {{first_path}}"
+      register: file1_perm
+      delegate_to: "{{groups.Run_1[0]}}"
+      run_once: yes
+    - command: "ls -Z {{second_path}}"
+      register: file2_perm
+      delegate_to: "{{groups.Run_2[0]}}"
+      run_once: yes
+    - command: "getenforce"
+      register: run1_S
+      delegate_to: "{{groups.Run_1[0]}}"
+      run_once: yes
+    - command: "getenforce"
+      register: run2_S
+      delegate_to: "{{groups.Run_2[0]}}"
+      run_once: yes
+    - debug:
+       msg:
+        - "First file content is : {{file1_data.stdout}}"
+        - "Second file content is : {{file2_data.stdout}}"
+        - "Files content is the same ? {{file1_data.stdout == file2_data.stdout}}"
+        - "First file permissions are : {{file1_perm.stdout.split(' ')[0]}}"
+        - "Second file permissions are : {{file2_perm.stdout.split(' ')[0]}}"
+        - "Files permissions are the same ? {{file1_perm.stdout.split(' ')[0] == file2_perm.stdout.split(' ')[0]}}"
+        - "First file owner is : {{file1_perm.stdout.split(' ')[1]}}"
+        - "Second file owner is : {{file2_perm.stdout.split(' ')[1]}}"
+        - "Files owner is the same ? {{file1_perm.stdout.split(' ')[1] == file2_perm.stdout.split(' ')[1]}}"
+        - "First file group is : {{file1_perm.stdout.split(' ')[2]}}"
+        - "Second file group is : {{file2_perm.stdout.split(' ')[2]}}"
+        - "Files group is the same ? {{file1_perm.stdout.split(' ')[2] == file2_perm.stdout.split(' ')[2]}}"
+        - "First Run SELinux is : {{run1_S.stdout}}"
+        - "Second Run SELinux is : {{run2_S.stdout}}"
+        - "Runs SELinux is the same ? {{run1_S.stdout == run2_S.stdout}}"
+ 
+
+  
+  

@@ -1,0 +1,12 @@
+hypervisor_files:
+ - "/root/cbis-installer/templates/generic/firstboot/cbis/general_utils"
+
+undercloud_files:
+ - "/home/stack/templates/firstboot/cbis/general_utils"
+ - "/usr/share/cbis/undercloud/templates/generic/firstboot/cbis/general_utils"
+ - "/usr/share/cbis"
+
+overcloud_files:
+ - "/usr/share/cbis/undercloud/templates/generic/firstboot/cbis/general_utils"
+ - "/usr/share/cbis/"
+ - "/usr/share/cbis/utils"
