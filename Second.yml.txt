@@ -1,0 +1,40 @@
+---
+ - hosts: all
+   become: yes
+   gather_facts: no
+   vars:
+    - result_diff: []
+   vars_prompt:
+    - name: first_path
+      prompt: Enter file path in first run
+      private: false
+    - name: second_path
+      prompt: Enter file path in second run
+      private: false
+   tasks:
+    - find:
+        paths: "{{first_path}}"
+        recurse: yes
+      register: list_f
+    - set_fact:
+        list_f: |
+           {% set res= [] -%}
+           {% for file in list_f.files -%}
+             {% set result = res.extend([file.path[first_path|length+1:] ]) -%}
+           {%- endfor %}
+           {{res | unique }}
+     - shell: "diff <(stat -c '%a %U %G %C' '{{first_path}}/{{item}}' ) <(stat -c '%a %U %G %C' '{{second_path}}/{{item}}' ); true "
+       args: 
+         executable: /bin/bash
+       loop: "{{list_f}}"
+       register: output
+     - shell: "diff '{{first_path}}/{{item}}' '{{second_path}}/{{item}}'; true"
+       loop: "{{ list_f }}"
+       register: output1
+     - set_fact:
+          result_diff: "{{result_diff + [{item.item: item.stdout}] }}"
+       with_items:
+          - "{{output.results}}"
+     - debug:
+         msg:
+          - "{{result_diff}}"

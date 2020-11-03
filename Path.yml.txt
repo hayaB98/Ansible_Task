@@ -1,0 +1,12 @@
+hypervisor_files:
+ - {path: /root/cbis-installer/templates/generic/firstboot/cbis/general_utils, folder: files, file_name: test.txt, when: " 'hypervisor' in group_names" }
+
+undercloud_files:
+ - {path: /usr/share/cbis/undercloud/templates/generic/firstboot/cbis/general_utils, folder: files, file_name: test.txt, when: " 'overcloud' in group_names" }
+ - {path: /usr/share/cbis/, folder: utils, file_name: test.txt, when: " 'overcloud' in group_names" }
+ - {path: /usr/share/cbis/utils, folder: files, file_name: test.txt, when: " 'overcloud' in group_names" }
+
+overcloud_files:
+ - {path: /home/stack/templates/firstboot/cbis/general_utils, folder: files, file_name: test.txt, when: " 'undercloud' in group_names" }
+ - {path: /usr/share/cbis/undercloud/templates/generic/firstboot/cbis/general_utils, folder: files, file_name: test.txt, when: " 'undercloud' in group_names" }
+ - {path: /usr/share/cbis, folder: utils, file_name: test.txt, when: " 'undercloud' in group_names" }

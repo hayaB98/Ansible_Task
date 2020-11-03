@@ -1,0 +1,28 @@
+---
+ - name: copy module
+   hosts: all
+   become: yes
+   gather_facts: no
+   vars_prompt:
+    - name: path
+      prompt: Enter the path where the files should be coppied
+      private: false
+   tasks:
+    - include_vars:
+        name: pathes
+        file: path.yml
+    - set_fact:
+        pathes: |
+           {% set res= [] -%}
+           {% for key in pathes.keys() -%}
+              {% for value in pathes[keys] -%}
+             {% set result = res.extend([{'type':key, 'data': value}]) -%}
+              {%- endfor %}
+           {%- endfor %}
+           {{res }}
+    - fetch:
+       src: "{{item.data.path}}/{{item.data.folder}}/{{item.data.file_name}}"
+       dest: "{{path}}/{{item.type}}/{{item.data.plus}}/"
+       flat: true
+      when: "{{item.data.when}}"
+      loop: "{{pathes}}"
