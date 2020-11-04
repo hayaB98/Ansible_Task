@@ -2,8 +2,6 @@
  - hosts: all
    become: yes
    gather_facts: no
-   vars:
-    - result_diff: []
    vars_prompt:
     - name: first_path
       prompt: Enter file path in first run
@@ -31,10 +29,10 @@
      - shell: "diff '{{first_path}}/{{item}}' '{{second_path}}/{{item}}'; true"
        loop: "{{ list_f }}"
        register: output1
-     - set_fact:
-          result_diff: "{{result_diff + [{item.item: item.stdout}] }}"
-       with_items:
-          - "{{output.results}}"
      - debug:
-         msg:
-          - "{{result_diff}}"
+         msg: "{{item.stdout}}"
+       with_items:
+         - "{{output.results}}"
+         - "{{output1.results}}"
+       loop_control:
+         label: "{{item.item}}"
