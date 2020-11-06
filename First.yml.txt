@@ -11,18 +11,20 @@
     - include_vars:
         name: pathes
         file: path.yml
+
     - set_fact:
         pathes: |
            {% set res= [] -%}
            {% for key in pathes.keys() -%}
               {% for value in pathes[key] -%}
-             {% set result = res.extend([{'type':key, 'data': value}]) -%}
+             {% set result = res.extend([{'type':key, 'data': value.path + '/' + value.folder + '/' + value.file_name if(value.path[-1] != '/') else value.path + value.folder + '/' + value.file_name, 'when': "'" + key.split('_')[0] + "' in group_names" , 'plus': value.plus }]) -%}
               {%- endfor %}
            {%- endfor %}
            {{res }}
+
     - fetch:
-       src: "{{item.data.path}}/{{item.data.folder}}/{{item.data.file_name}}"
-       dest: "{{path}}/{{item.type}}/{{item.data.plus}}/"
+       src: "{{item.data}}"
+       dest: "{{path}}/{{item.type}}/{{item.plus}}/"
        flat: true
-      when: "{{item.data.when}}"
+      when: "{{item.when}}"
       loop: "{{pathes}}"
