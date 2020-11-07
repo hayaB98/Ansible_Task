@@ -26,13 +26,22 @@
          executable: /bin/bash
        loop: "{{list_f}}"
        register: output
-     - shell: "diff '{{first_path}}/{{item}}' '{{second_path}}/{{item}}'; true"
+     - copy:
+        src: "{{first_path}}/{{item}}"
+        dest: "{{second_path}}/{{item}}"
+       diff: yes
+       check_mode: yes
        loop: "{{ list_f }}"
        register: output1
      - debug:
          msg: "{{item.stdout}}"
        with_items:
          - "{{output.results}}"
+       loop_control:
+         label: "{{item.item}}"
+     - debug:
+         msg: "{{item.diff}}"
+       with_items:
          - "{{output1.results}}"
        loop_control:
          label: "{{item.item}}"
